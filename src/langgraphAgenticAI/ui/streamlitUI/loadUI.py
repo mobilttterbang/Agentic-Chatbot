@@ -14,6 +14,10 @@ class LoadStreamlitUI:
         st.set_page_config(page_title="🤖 " + self.config.get_page_title(), page_icon=":robot_face:", layout="wide")
         st.header("🤖 " + self.config.get_page_title())
 
+        # Initialize session state 
+        st.session_state.IsFetchButtonClicked = False
+        st.session_state.timeframe = ""
+
         # Create the sidebar
         with st.sidebar:
             st.subheader("Customize")
@@ -41,13 +45,26 @@ class LoadStreamlitUI:
             # 2 - USE-CASE Selection
             self.user_controls["selected_usecase"] = st.selectbox("Select Use Case", usecase_options, key="usecase")
             
-            # Tavily Tools - USECASE
-            if self.user_controls["selected_usecase"] == "Chatbot with Web":
+            # Open WebSearch API Key if usecase is Chatbot with Web or AI News
+            if self.user_controls["selected_usecase"] == "Chatbot with Web" or self.user_controls["selected_usecase"] == "AI News":
                 os.environ["TAVILY_API_KEY"] = self.user_controls["TAVILY_API_KEY"] = st.session_state["TAVILY_API_KEY"] = st.text_input("Enter Tavily API Key", type="password", key="tavily_api_key")
                 if not self.user_controls["TAVILY_API_KEY"]:
                     st.warning("⚠⚠⚠ Please enter your Tavily API Key ⚠⚠⚠")
                 else:
                     st.success("✓ Tavily API Key entered successfully")
-                    st.success(f"{self.user_controls['TAVILY_API_KEY']}")
+            
+            # AI News Explorer
+            if self.user_controls["selected_usecase"] == "AI News":
+                st.subheader("AI News Explorer")
+                with st.sidebar:
+                    time_frame = st.selectbox(
+                        "Select Time Frame",
+                        ["Daily","Weekly","Monthly"],
+                        index=0
+                    )
+
+                if st.button("Fetch Latest AI News", use_container_width=True):
+                    st.session_state.IsFetchButtonClicked = True
+                    st.session_state.timeframe = time_frame
 
         return self.user_controls

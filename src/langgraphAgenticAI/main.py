@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 from src.langgraphAgenticAI.ui.streamlitUI.loadUI import LoadStreamlitUI
 from src.langgraphAgenticAI.LLMs.groqLLM import GroqLLM
@@ -19,7 +20,12 @@ def load_langgraph_agenticAI_app():
         st.error("Error: Failed to load user input from the UI.")
         return
 
-    user_message = st.chat_input("Ask me anything...")
+    # Set conditions for FETCH-BUTTON 
+    ## Dont forget to INITIALIZE the session state
+    if st.session_state.IsFetchButtonClicked:
+        user_message = st.session_state.timeframe
+    else:
+        user_message = st.chat_input("Ask me anything...")
 
     if user_message:
         try:
